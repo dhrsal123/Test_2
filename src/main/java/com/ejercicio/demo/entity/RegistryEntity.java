@@ -25,8 +25,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @Table(name = "registry_entity")
 public class RegistryEntity {
-    // add expiration date for JWT & as such, when jwt expires, active will become
-    // null
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
