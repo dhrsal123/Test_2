@@ -96,14 +96,13 @@ public class RegistryServiceImpl implements RegistryService {
         return response;
     }
 
-    @Override
     public String validate(String email, String password, String name) {
         try {
             if (Pattern.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email) == false) {
                 return "Email deformado";
             } else if (Pattern.matches(environment.getProperty("app.regexRegistry"), password) == false) {
                 return "La contraseña debe tener: 1 Mayuscula, 1 Minuscula, 1 Numero y ser como minimo de 6 caracteres";
-            } else if (name.length() < 3) {
+            } else if (name.length() < 3 || Pattern.matches("[^a-zA-Z]", name) == true) {
                 return "Ingresa un nombre valido";
             }
             return "Correcto";
