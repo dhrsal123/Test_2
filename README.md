@@ -1,1 +1,2 @@
 Para probar este proyecto, debes configurar la variable de ambiente "app.regexRegistry" a la expresion regular por la cual quieres evaluar la contraseña, existe el panel para h2(h2-console) y para swagger (swagger-ui.html), inicia la aplicacion desde tu ide favorito y luego corre la script 'llenarDb.py' para llenar la base de datos con datos genericos, lo puedes correr usando 'python llenarDb.py'
+Para correr las pruebas unitarias, usa "mvn test"
