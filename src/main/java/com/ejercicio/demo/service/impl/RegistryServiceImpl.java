@@ -41,12 +41,12 @@ public class RegistryServiceImpl implements RegistryService {
         } catch (Exception e) {
             return new MessageDto("Es necesario que ingreses todos tus datos");
         }
-        if (registryRepository.existsByEmail(registryDto.getEmail())) {
-            return new MessageDto("El correo ya esta registrado");
-        }
         String validate = validate(registryDto.getEmail(), registryDto.getPassword(), registryDto.getName());
         if (validate != "Correcto") {
             return new MessageDto(validate);
+        }
+        if (registryRepository.existsByEmail(registryDto.getEmail())) {
+            return new MessageDto("El correo ya esta registrado");
         }
         RegistryEntity register = new RegistryEntity();
         register.setName(registryDto.getName());
