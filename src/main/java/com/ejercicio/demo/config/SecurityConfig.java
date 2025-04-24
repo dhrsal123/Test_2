@@ -19,6 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll());
+        // habilitar/deshabilitar dependiendo si se va a usra h2 conosle
         http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
         return http.build();
     }

@@ -107,7 +107,23 @@ public class RegistryServiceImpl implements RegistryService {
             }
             return "Correcto";
         } catch (Exception e) {
-            return "Ingresa todos tus datos";
+            if (e.getMessage().equals(
+                    "Cannot invoke \"org.springframework.core.env.Environment.getProperty(String)\" because \"this.environment\" is null")) {
+                try {
+                    if (Pattern.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email) == false) {
+                        return "Email deformado";
+                    } else if (Pattern.matches("^((?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9]).{6,})$",
+                            password) == false) {
+                        return "La contraseña debe tener: 1 Mayuscula, 1 Minuscula, 1 Numero y ser como minimo de 6 caracteres";
+                    } else if (name.length() < 3 || Pattern.matches("[^a-zA-Z]", name) == true) {
+                        return "Ingresa un nombre valido";
+                    }
+                    return "Correcto";
+                } catch (Exception e2) {
+
+                }
+            }
+            return "Es necesario que ingreses todos tus datos";
         }
     }
 }
