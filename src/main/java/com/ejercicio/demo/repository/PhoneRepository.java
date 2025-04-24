@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.ejercicio.demo.entity.PhoneEntity;
 
 @Repository
-public interface PhoneRepository extends JpaRepository<PhoneEntity, String> {
-    PhoneEntity findByNumberAndCountrycodeAndCitycode(String phone, String cityCode, String countryCode);
+public interface PhoneRepository extends JpaRepository<PhoneEntity, Long> {
+    PhoneEntity findByNumber(String number);
 }

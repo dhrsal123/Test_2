@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,7 @@ public class RegistryServiceImpl implements RegistryService {
     RegistryRepository registryRepository;
     private PasswordEncoder passwordEncoder;
     PhoneRepository phoneRepository;
+    private Environment environment;
 
     @Override
     public Object register(RegistryDto registryDto) {
@@ -42,23 +44,34 @@ public class RegistryServiceImpl implements RegistryService {
             return new MessageDto(validate);
         }
         RegistryEntity register = new RegistryEntity();
-        // register.setId(UUID.randomUUID().toString());
         register.setName(registryDto.getName());
         register.setEmail(registryDto.getEmail());
         register.setPassword(passwordEncoder.encode(registryDto.getPassword()));
         List<PhoneEntity> phones = new ArrayList<>();
         registryDto.getPhones().forEach((phone) -> {
-            PhoneEntity curEntity = new PhoneEntity(UUID.randomUUID().toString(), phone.getNumber(),
-                    phone.getCitycode(), phone.getCountrycode());
-            PhoneEntity exists = phoneRepository.findByNumberAndCountrycodeAndCitycode(phone.getNumber(),
-                    phone.getCitycode(), phone.getCountrycode());
-            if (exists != null) {
-                phones.add(exists);
-            } else {
-                phoneRepository.save(curEntity);
-                phones.add(curEntity);
+            try {
+                if (phone.getCitycode().length() >= 1 && phone.getCountrycode().length() >= 1
+                        && phone.getNumber().length() >= 4) {
+                    PhoneEntity curEntity = new PhoneEntity();
+                    curEntity.setCitycode(phone.getCitycode());
+                    curEntity.setCountrycode(phone.getCountrycode());
+                    curEntity.setNumber(phone.getNumber());
+                    // PhoneEntity exists = phoneRepository.findByNumber(phone.getNumber());
+                    // if (exists != null) {
+                    // phones.add(exists);
+                    // } else {
+
+                    // Deberia haber problema por numeros duplicados??
+                    phoneRepository.save(curEntity);
+                    phones.add(curEntity);
+                    // }
+                }
+            } catch (Exception e) {
             }
         });
+        if (phones.size() == 0) {
+            return new MessageDto("Numero telefonico no valido");
+        }
         LocalDateTime creation = LocalDateTime.now();
         register.setUUIDId(UUID.randomUUID().toString());
         register.setPhones(phones);
@@ -71,7 +84,7 @@ public class RegistryServiceImpl implements RegistryService {
         try {
             registryRepository.save(register);
         } catch (Exception e) {
-            return new MessageDto("Error al crear el usuario" + e.getMessage());
+            return new MessageDto("Error al crear el usuario");
         }
         RegistryReturnDto response = new RegistryReturnDto(register.getId(), register.getCreated(),
                 register.getModified(), register.getLast_login(), register.getToken(), register.getIsactive());
@@ -81,7 +94,7 @@ public class RegistryServiceImpl implements RegistryService {
     public String validate(String email, String password, String name) {
         if (Pattern.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", email) == false) {
             return "Email deformado";
-        } else if (Pattern.matches("^((?=\\S*?[A-Z])(?=\\S*?[a-z])(?=\\S*?[0-9]).{6,})$", password) == false) {
+        } else if (Pattern.matches(environment.getProperty("app.regexRegistry"), password) == false) {
             return "La contraseña debe tener: 1 Mayuscula, 1 Minuscula, 1 Numero y ser como minimo de 6 caracteres";
         } else if (name.length() < 3) {
             return "Ingresa un nombre valido";

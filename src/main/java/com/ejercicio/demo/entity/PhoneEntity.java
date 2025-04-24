@@ -18,8 +18,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "phone_numbers")
 public class PhoneEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String number;
     private String citycode;
     private String countrycode;

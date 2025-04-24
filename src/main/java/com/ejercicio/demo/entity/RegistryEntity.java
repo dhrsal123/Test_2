@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -32,14 +33,15 @@ public class RegistryEntity {
     @Column(nullable = false, unique = true, updatable = false)
     private String UUIDId;
     @Column(nullable = false)
+    @Size(min = 3, max = 100)
     private String name;
-
     @Column(nullable = false)
+    @Size(min = 3, max = 100)
     private String email;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false)
-    @OneToMany(cascade = CascadeType.MERGE)
+    @OneToMany(cascade = CascadeType.ALL)
     private List<PhoneEntity> phones;
     @Column(nullable = false, updatable = false)
     private LocalDateTime created;
