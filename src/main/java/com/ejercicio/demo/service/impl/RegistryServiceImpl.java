@@ -32,8 +32,13 @@ public class RegistryServiceImpl implements RegistryService {
 
     @Override
     public Object register(RegistryDto registryDto) {
-        if (registryDto.getEmail().isEmpty() || registryDto.getName().isEmpty() || registryDto.getPassword().isEmpty()
-                || registryDto.getPhones().size() == 0) {
+        try {
+            if (registryDto.getEmail().isEmpty() || registryDto.getName().isEmpty()
+                    || registryDto.getPassword().isEmpty()
+                    || registryDto.getPhones().size() == 0) {
+                return new MessageDto("Es necesario que ingreses todos tus datos");
+            }
+        } catch (Exception e) {
             return new MessageDto("Es necesario que ingreses todos tus datos");
         }
         if (registryRepository.existsByEmail(registryDto.getEmail())) {
