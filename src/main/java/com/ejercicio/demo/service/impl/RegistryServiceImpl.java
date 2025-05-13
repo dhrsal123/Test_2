@@ -1,14 +1,15 @@
 package com.ejercicio.demo.service.impl;
 
+import com.ejercicio.demo.dto.EmailDto;
 import com.ejercicio.demo.exceptions.BadRequestException;
 import com.ejercicio.demo.exceptions.NotFoundException;
 import com.ejercicio.demo.mapper.RegistryMapper;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,11 +24,11 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Validated
 public class RegistryServiceImpl implements RegistryService {
     private final RegistryRepository registryRepository;
     private final PasswordEncoder passwordEncoder;
@@ -37,9 +38,9 @@ public class RegistryServiceImpl implements RegistryService {
     //Arreglar exepciones, tverminar crud, registar, actualizar, buscar por email, buscar todos paginado y eliminar
     /*Hecho/por hacer
     [+] eliminar (hecho?)
-    [] crear
-    [] buscar email
-    [] buscar todos
+    [+-] crear
+    [+-] buscar email
+    [+] buscar todos / paginado(~hecho)
     [] actualizar
      */
     @Override
@@ -61,32 +62,40 @@ public class RegistryServiceImpl implements RegistryService {
     }
 
     @Override
-    public Object getByEmail(@NotBlank @Validated @Email String email) {
-        //completly validate the email
-        log.error(email);
-        RegistryEntity response=registryRepository.findByEmail(email);
+    public Object getByEmail(@NotNull @Valid EmailDto email) {
+        //[] completly validate the email
+        RegistryEntity response=registryRepository.findByEmail(email.getEmail());
         if(response==null) {
             throw new BadRequestException("El email no existe");
         }
-        return registryMapper.toRegistryDto(response);
+        return registryMapper.toRegistryReturnDto(response);
     }
-
     @Override
-    public Object getAll() {
-        List<RegistryEntity> response=registryRepository.findAll();
-        response.forEach(registryMapper::toRegistryDto);
-        return response;
+    public Object getAll(int page, int size) {
+        List<RegistryEntity> response=registryRepository.findAll(PageRequest.of(page,size)).getContent();
+        List<RegistryReturnDto> ret=new ArrayList<>();
+        for (RegistryEntity t : response) {
+            ret.add(registryMapper.toRegistryReturnDto(t));
+        }
+        return ret;
     }
-
     @Override
     public Object updateUser(RegistryDto registryDto) {
-        return null;
+        registryValidatorHelper.validate(registryDto);
+        RegistryEntity response=registryRepository.findByEmail(registryDto.getEmail());
+        if(response==null) {
+            throw new BadRequestException("Usuario inexistente");
+        }
+        response.setEmail(registryDto.getEmail());
+        response.setName(registryDto.getName());
+        response.setPassword(passwordEncoder.encode(registryDto.getPassword()));
+        registryRepository.save(response);
+        return registryMapper.toRegistryReturnDto(response);
     }
-
     @Override
     public Object deleteUserById(@NotNull @Valid Long id) {
-        if(id<=0 || !registryRepository.existsById(id)) {
-            throw new NotFoundException("Invalid id");
+        if(!registryRepository.existsById(id)) {
+            throw new NotFoundException("User not found");
         }
         registryRepository.deleteById(id);
         return "Successfully deleted user";

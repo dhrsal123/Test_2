@@ -5,8 +5,12 @@ import com.ejercicio.demo.exceptions.BadRequestException;
 import com.ejercicio.demo.exceptions.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class RestControllerAdvicer {
@@ -24,5 +28,9 @@ public class RestControllerAdvicer {
     public ResponseEntity<MessageDto> handleNotFoundException(NotFoundException exception) {
         MessageDto messageDto = new MessageDto(exception.getMessage());
         return new ResponseEntity<>(messageDto, HttpStatus.NOT_FOUND);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<MessageDto> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        return new ResponseEntity<>(new MessageDto("Something went wrong "+ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }
