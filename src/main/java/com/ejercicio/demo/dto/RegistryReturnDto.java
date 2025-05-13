@@ -15,7 +15,7 @@ public class RegistryReturnDto {
     private Long id;
     private LocalDateTime created;
     private LocalDateTime modified;
-    private LocalDateTime last_login;
+    private LocalDateTime lastLogin;
     private String token;
-    private Boolean isactive;
+    private Boolean isActive;
 }

@@ -15,7 +15,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "phone_numbers")
 public class PhoneEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -1,57 +1,48 @@
 package com.ejercicio.demo.entity;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
 import java.util.Date;
 import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
 @Builder
-@Table(name = "registry_entity")
-public class RegistryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Getter
+@Setter
+public class RegistryEntity extends BaseEntity {
+
     @Column(nullable = false, unique = true, updatable = false)
-    private String UUIDId;
+    private String UUID;
+
     @Column(nullable = false)
     @Size(min = 3, max = 100)
     private String name;
+
     @Column(nullable = false)
     @Size(min = 3, max = 100)
+    @Email(message = "Email deformado",regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
     private String email;
+
     @Column(nullable = false)
     private String password;
+
     @Column(nullable = false)
-    @OneToMany(cascade = CascadeType.ALL)
-    private List<PhoneEntity> phones;
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime created;
-    @Column(nullable = false)
-    private LocalDateTime modified;
-    @Column(nullable = false)
-    private LocalDateTime last_login;
-    @Column(nullable = false)
-    private Boolean isactive;
+    private Boolean isActive;
+
     @Column(unique = true)
     private String token;
+
     @Column(nullable = false)
     private Date expireDate;
+
+    @Column(nullable = false, updatable = false)
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<PhoneEntity> phones;
 
 }
