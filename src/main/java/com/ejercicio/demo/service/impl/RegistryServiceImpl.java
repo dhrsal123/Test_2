@@ -80,7 +80,7 @@ public class RegistryServiceImpl implements RegistryService {
         return ret;
     }
     @Override
-    public Object updateUser(RegistryDto registryDto) {
+    public Object updateUser(@NotNull @Valid RegistryDto registryDto) {
         registryValidatorHelper.validate(registryDto);
         RegistryEntity response=registryRepository.findByEmail(registryDto.getEmail());
         if(response==null) {
